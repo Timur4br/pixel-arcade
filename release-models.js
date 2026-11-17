@@ -19,7 +19,7 @@ MoreModels.create=function(id,c={}){
  if(id==='battleship'){
   s.shipLengths=s.ships.map(x=>x.length);
   m.previewShip=(index,p,vertical=s.vertical)=>{
-   const len=s.shipLengths[index];if(!len||p<0||p>=100)return null;const x=p%10,y=p/10|0;
+   const len=s.shipLengths[index];if(!Number.isInteger(index)||!Number.isInteger(p)||!len||p<0||p>=100)return null;const x=p%10,y=p/10|0;
    const coords=Array.from({length:len},(_,k)=>[x+(vertical?0:k),y+(vertical?k:0)]);
    if(coords.some(([x,y])=>x>=10||y>=10))return null;
    const other=s.ships.filter((_,i)=>i!==index).flat();if(coords.some(([x,y])=>other.some(p=>Math.abs(p%10-x)<=1&&Math.abs((p/10|0)-y)<=1)))return null;
@@ -139,8 +139,11 @@ function tanks(c){
  const m={s,realtime:true,inputs:[],buttons:[{action:'shoot',label:'Огонь'}],help:'Стрелки перемещают танк и поворачивают башню. Пробел или «Огонь» выпускает снаряд: он летит до первого препятствия. Кирпичи разрушаются, бетон — нет. Уничтожь вражеские танки, уклоняясь от их снарядов.'};
  m.act=(a,d)=>{if(s.done)return;if(a==='direction'&&delta(d)){s.dir=d;const n=s.pos+delta(d);if(s.moveCooldown<=0&&adjacent(s.pos,w,h).includes(n)&&clear(n)&&!s.enemies.includes(n)){s.pos=n;s.moveCooldown=.12}}if(a==='shoot'&&s.cooldown<=0){shot(s.pos,s.dir,false);s.cooldown=.25}};
  m.bot=()=>{for(const e of s.enemies){if(e%w===s.pos%w||(e/w|0)===(s.pos/w|0)){s.dir=e%w===s.pos%w?e>s.pos?'down':'up':e>s.pos?'right':'left';m.act('shoot');return}}const route=R.search(s.pos,p=>s.enemies.some(e=>p%w===e%w||(p/w|0)===(e/w|0)),p=>adjacent(p,w,h).filter(i=>clear(i)&&!s.enemies.includes(i))).path;if(route[1]!==undefined)m.act('direction',Object.keys({up:0,down:0,left:0,right:0}).find(d=>delta(d)===route[1]-s.pos))};
+ s.enemyTanks=s.enemies.map((pos,id)=>({id,pos,dir:'down',angle:180,x:pos%w+.5,y:(pos/w|0)+.5}));
  m.tick=(dt,bot)=>{if(s.done)return;s.cooldown-=dt;s.moveCooldown-=dt;s.elapsed+=dt;s.enemyClock+=dt;s.blast=s.blast.filter(b=>(b.life-=dt)>0);if(bot&&s.elapsed>.13){s.elapsed=0;m.bot()}
-  if(s.enemyClock>1){s.enemyClock=0;s.enemies=s.enemies.map(p=>{let d=p%w===s.pos%w?s.pos>p?'down':'up':(p/w|0)===(s.pos/w|0)?s.pos>p?'right':'left':null;if(d)shot(p,d,true);const choices=adjacent(p,w,h).filter(i=>clear(i)&&i!==s.pos&&!s.enemies.includes(i));return !d&&choices.length?choices[random()*choices.length|0]:p})}
+  s.enemyTanks=s.enemyTanks.filter(e=>s.enemies.includes(e.pos));for(const pos of s.enemies)if(!s.enemyTanks.some(e=>e.pos===pos))s.enemyTanks.push({id:pos,pos,dir:'down',angle:180,x:pos%w+.5,y:(pos/w|0)+.5});
+ if(s.enemyClock>1){s.enemyClock=0;for(const e of s.enemyTanks){const p=e.pos;let d=p%w===s.pos%w?s.pos>p?'down':'up':(p/w|0)===(s.pos/w|0)?s.pos>p?'right':'left':null;if(d){e.dir=d;shot(p,d,true)}else{const choices=adjacent(p,w,h).filter(i=>clear(i)&&i!==s.pos&&!s.enemyTanks.some(t=>t.pos===i));if(choices.length){e.pos=choices[random()*choices.length|0];e.dir=Object.keys({up:0,down:0,left:0,right:0}).find(d=>delta(d)===e.pos-p)}}}s.enemies=s.enemyTanks.map(e=>e.pos)}
+ for(const e of s.enemyTanks){const target={up:0,right:90,down:180,left:270}[e.dir],turn=((target-e.angle+540)%360)-180;e.angle+=Math.sign(turn)*Math.min(Math.abs(turn),dt*540);const tx=e.pos%w+.5,ty=(e.pos/w|0)+.5;e.x+=Math.sign(tx-e.x)*Math.min(Math.abs(tx-e.x),dt/.18);e.y+=Math.sign(ty-e.y)*Math.min(Math.abs(ty-e.y),dt/.18)}
   const kept=[];for(const b of s.bullets){let alive=true;const steps=Math.ceil(dt*12/.2);for(let k=0;k<steps&&alive;k++){b.x+=({right:1,left:-1}[b.dir]||0)*12*dt/steps;b.y+=({down:1,up:-1}[b.dir]||0)*12*dt/steps;const p=Math.floor(b.y)*w+Math.floor(b.x);if(!clear(p)){s.walls=s.walls.filter(i=>i!==p);s.blast.push({pos:p,life:.2});alive=false}else if(b.enemy&&p===s.pos){s.hp--;alive=false;s.blast.push({pos:p,life:.3})}else if(!b.enemy&&s.enemies.includes(p)){s.enemies=s.enemies.filter(i=>i!==p);s.score+=100;alive=false;s.blast.push({pos:p,life:.35})}}if(alive)kept.push(b)}s.bullets=kept;if(s.hp<=0)finish(s,'Танк уничтожен.');else if(!s.enemies.length)finish(s,'Все вражеские танки уничтожены!');
  };m.view=()=>grid(s,Array.from({length:w*h},(_,i)=>cell('',s.hard.includes(i)?'wall':s.walls.includes(i)?'brick':'')),'Броня '+s.hp+' · Врагов '+s.enemies.length);return m;
 }

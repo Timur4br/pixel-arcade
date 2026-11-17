@@ -14,7 +14,7 @@ function courseGrid(level,state,id){
  }).join('')}</div>`;
 }
 function shipSVG(length,vertical=false){
- const len=length*24,shape=`<path d="M2 5L${len-12} 3L${len-2} 12L${len-12} 21L2 19Z" fill="#849d9b" stroke="#d4dfc3" stroke-width="2"/><path d="M6 8H${len-15}V16H6Z" fill="#3e6174"/>${Array.from({length:length-1},(_,i)=>`<path d="M${(i+1)*24} 5V19" stroke="#607c80" stroke-width="1"/>`).join('')}<rect x="${Math.max(6,len*.4)}" y="7" width="10" height="10" fill="#c1c7a4"/><path d="M${len*.4+8} 12H${len*.4+21}" stroke="#e0d5a3" stroke-width="3"/>`;
+ const len=length*24,shape=`<path d="M2 5L${len-12} 3L${len-2} 12L${len-12} 21L2 19Z" fill="#849d9b" stroke="#d4dfc3" stroke-width="2"/><path d="M6 8H${len-15}V16H6Z" fill="#3e6174"/>${Array.from({length:length-1},(_,i)=>`<path d="M${(i+1)*24} 5V19" stroke="#607c80" stroke-width="1"/>`).join('')}<rect x="${Math.min(len-14,Math.max(4,len*.4))}" y="7" width="10" height="10" fill="#c1c7a4"/><path d="M${Math.min(len-8,len*.4+8)} 12H${len-3}" stroke="#e0d5a3" stroke-width="3"/>`;
  return `<svg viewBox="0 0 ${vertical?24:len} ${vertical?len:24}" preserveAspectRatio="none" aria-hidden="true">${vertical?'<g transform="translate(24 0) rotate(90)">'+shape+'</g>':shape}</svg>`;
 }
 function fleet(s){
@@ -66,7 +66,7 @@ function picture(c,name,x,y,w,h=w,angle=0){if(!pictures[name]){pictures[name]=ne
 function tanks(c,s){
  const size=48,W=s.w*size,H=s.h*size;if(c.canvas.width!==W)c.canvas.width=W;if(c.canvas.height!==H)c.canvas.height=H;c.imageSmoothingEnabled=false;c.fillStyle='#183b36';c.fillRect(0,0,W,H);
  for(let i=0;i<s.w*s.h;i++){const x=i%s.w*size,y=(i/s.w|0)*size;c.fillStyle=(i+(i/s.w|0))%2?'#21473c':'#234b40';c.fillRect(x,y,size,size);if(s.hard.includes(i))picture(c,'rock',x,y,size);else if(s.walls.includes(i))picture(c,'wall',x,y,size)}
- for(const e of s.enemies){c.save();c.filter='hue-rotate(140deg)';picture(c,'tank',(e%s.w)*size,(e/s.w|0)*size,size,size,180);c.restore()}
+ for(const pos of s.enemies){const e=s.enemyTanks?.find(e=>e.pos===pos);c.save();c.filter='hue-rotate(140deg)';picture(c,'tank',((e?.x??pos%s.w+.5)-.5)*size,((e?.y??(pos/s.w|0)+.5)-.5)*size,size,size,e?.angle??180);c.restore()}
  const x=s.visual?.x??s.pos%s.w+.5,y=s.visual?.y??(s.pos/s.w|0)+.5;picture(c,'tank',(x-.5)*size,(y-.5)*size,size,size,{up:0,right:90,down:180,left:270}[s.dir]);
  for(const b of s.bullets){const x=b.x*size,y=b.y*size,dx=({left:-1,right:1}[b.dir]||0),dy=({up:-1,down:1}[b.dir]||0);c.strokeStyle=b.enemy?'#ed99774d':'#ffdd914d';c.lineWidth=5;c.beginPath();c.moveTo(x-dx*18,y-dy*18);c.lineTo(x,y);c.stroke();c.fillStyle=b.enemy?'#ffa77d':'#fff4b5';c.fillRect(x-3,y-3,6,6)}
  for(const b of s.blast){const x=(b.pos%s.w+.5)*size,y=((b.pos/s.w|0)+.5)*size;c.fillStyle='#f4b65b';c.globalAlpha=Math.min(1,b.life*5);c.fillRect(x-13,y-4,26,8);c.fillRect(x-4,y-13,8,26);c.globalAlpha=1}return true;

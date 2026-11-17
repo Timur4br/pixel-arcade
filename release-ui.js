@@ -18,7 +18,7 @@ function patch(parent,html){
 function editor(panel,onClose){
  const dialog=document.createElement('dialog');dialog.className='editor-dialog';
  const close=document.createElement('button');close.className='secondary editor-close';close.textContent='Готово — вернуться к игре';
- panel.before(dialog);dialog.append(close,panel);panel.hidden=false;
+ const heading=document.createElement('div');heading.className='editor-dialog-header';const title=document.createElement('strong');title.textContent='Редактор уровня';heading.append(title,close);panel.before(dialog);dialog.append(heading,panel);panel.hidden=false;
  close.onclick=()=>dialog.close();dialog.addEventListener('close',onClose);
  return {open(){dialog.showModal()},close(){dialog.close()},dispose(){dialog.remove()}};
 }

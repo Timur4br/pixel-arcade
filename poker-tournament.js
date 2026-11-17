@@ -16,6 +16,7 @@ function distribute(players,board,dealer=0){
 function create(config={}){
  const variant=config.variant||0,random=R.rng(config.seed??Date.now()),initial=1000;
  const s={id:'poker',players:['Ты','Бот Лис','Бот Рок','Бот Неон'].map(name=>({name,stack:initial,hand:[],roundBet:0,totalBet:0,folded:false,allIn:false,actedSinceRaise:false,lastAction:''})),initial,score:0,done:false,message:'Собери все фишки трёх ботов.',handNo:0,dealer:3,actor:-1,community:[],pot:0,handDone:true,stage:0,currentBet:0,minRaise:20,pending:[],elapsed:0,log:[],raiseDraft:40,pots:[],reveal:false};
+ s.difficulty=['Лёгкий','Средний','Сложный'][variant];s.equitySamples=0;
  const names=['Префлоп','Флоп','Тёрн','Ривер'];
  const m={s,realtime:true,buttons:[],inputs:[],best,help:'Турнир в безлимитный холдем: ты и три бота, по 1000 игровых фишек. Цель — забрать все фишки ботов. У каждого 2 личные карты, 5 общих; побеждает лучшая пятёрка из семи. Есть чек, колл, повышение до указанной суммы, пас и олл-ин. Блайнды растут каждые 6 раздач. Правила и комбинации раскрываются ниже.'};
  const active=()=>s.players.map((p,i)=>!p.folded?i:-1).filter(i=>i>=0),canAct=i=>!s.players[i].folded&&!s.players[i].allIn&&s.players[i].stack>0;
@@ -78,14 +79,23 @@ function create(config={}){
   if(s.community.length>=3){const rank=R.pokerRank(best([...p.hand,...s.community]));return Math.min(.98,.3+rank.category*.11+(Math.max(...p.hand.map(c=>c%13))+2)/100)}
   const ranks=p.hand.map(c=>c%13+2).sort((a,b)=>b-a),pair=ranks[0]===ranks[1],suited=(p.hand[0]/13|0)===(p.hand[1]/13|0);return Math.min(.98,(ranks[0]+ranks[1])/38+(pair?.25:0)+(suited?.06:0));
  }
+ // Sample from all cards unknown to this player, never from opponents' hands or the actual deck.
+ function equity(playerIndex,samples){const p=s.players[playerIndex],known=[...p.hand,...s.community],pool=Array.from({length:52},(_,i)=>i).filter(c=>!known.includes(c)),opponents=active().filter(i=>i!==playerIndex).length;let sum=0;for(let k=0;k<samples;k++){const deck=[...pool],take=()=>{const n=random()*deck.length|0;return deck.splice(n,1)[0]},board=[...s.community];while(board.length<5)board.push(take());const own=best([...p.hand,...board]);let winners=1,lost=false;for(let j=0;j<opponents;j++){const other=best([take(),take(),...board]),cmp=R.comparePoker(other,own);if(cmp>0)lost=true;else if(cmp===0)winners++}if(!lost)sum+=1/winners}s.equitySamples=samples;return sum/samples}
+ function strategicBot(i,p,o){const hard=variant===2,odds=o.toCall/(s.pot+o.toCall||1),power=equity(i,hard?100:32),position=(i-s.dealer+4)%4,margin=hard?.025:.075,affordable=o.toCall<=Math.max(s.bigBlind,p.stack*(hard?.22:.14));
+  if(o.toCall&&power+margin<odds&&!(hard&&affordable&&random()<.05)){m.act('fold');return}
+  // Value bets scale with the pot; occasional small late-position bluffs remain legal.
+  const bluff=!o.toCall&&position<=1&&random()<(hard?.13:.04),threshold=hard?.53:.65;
+  if(o.canRaise&&(power>threshold||bluff)&&random()<(hard?.8:.55)){let increment=Math.round(Math.max(s.bigBlind,s.pot*(power>.8?.85:hard?.6:.4)));const target=Math.min(o.max,Math.max(o.min,s.currentBet+increment));if(power>.74||target-p.roundBet<=p.stack*.35||bluff){m.act('raise',0,{raise:target});return}}
+  m.act(o.toCall?'call':'check');
+ }
  m.bot=()=>{
-  if(s.done)return;if(s.handDone){newHand();return}const i=s.actor,p=s.players[i],o=m.options(),power=strength(p),odds=o.toCall/(s.pot+o.toCall||1),risk=o.toCall/(p.stack+o.toCall||1);
+  if(s.done)return;if(s.handDone){newHand();return}const i=s.actor,p=s.players[i],o=m.options();if(variant>0){strategicBot(i,p,o);return}const power=strength(p),odds=o.toCall/(s.pot+o.toCall||1),risk=o.toCall/(p.stack+o.toCall||1);
   if(o.toCall>0&&power+random()*.23<.4+odds*.7+risk*.35){m.act('fold');return}
   if(o.canRaise&&(power>.72||random()<.055)&&random()<.4){const target=Math.min(o.max,Math.max(o.min,s.currentBet+s.bigBlind*(power>.8?3:1)));m.act('raise',0,{raise:target});return}
   m.act(o.toCall?'call':'check');
  };
  m.tick=(dt,botMode)=>{if(s.done)return;if(s.handDone){if(botMode){s.elapsed+=dt;if(s.elapsed>=1.5){s.elapsed=0;newHand()}}return}if(s.actor===0&&!botMode)return;s.elapsed+=dt;if(s.elapsed>=.7){s.elapsed=0;m.bot()}};
- m.view=()=>({kind:'tournament',info:'Раздача '+s.handNo+' · '+names[s.stage]+' · Блайнды '+s.smallBlind+'/'+s.bigBlind+' · В игре '+s.players.filter(p=>p.stack>0||p.totalBet>0).length+'/4'});
+ m.view=()=>({kind:'tournament',info:s.difficulty+' · Раздача '+s.handNo+' · '+names[s.stage]+' · Блайнды '+s.smallBlind+'/'+s.bigBlind+' · В игре '+s.players.filter(p=>p.stack>0||p.totalBet>0).length+'/4'});
  newHand();return m;
 }
 return {create,best,distribute};
