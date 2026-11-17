@@ -26,7 +26,7 @@ MoreModels.create=function(id,config={}){
   const oldAct=m.act,tick=m.tick;s.visual={x:s.pos%s.w+.5,y:(s.pos/s.w|0)+.5};
   m.act=(a,d)=>{const tx=s.pos%s.w+.5,ty=(s.pos/s.w|0)+.5;if(Math.abs(tx-s.visual.x)+Math.abs(ty-s.visual.y)>1.5)s.visual={x:tx,y:ty};const n=s.bullets.length;oldAct(a,d);if(a==='shoot'&&s.bullets.length>n){const b=s.bullets.at(-1);b.x=s.visual.x;b.y=s.visual.y}};
   m.tick=(dt,bot)=>{tick(dt,bot);const x=s.pos%s.w+.5,y=(s.pos/s.w|0)+.5,max=dt/ .12;s.visual.x+=Math.sign(x-s.visual.x)*Math.min(Math.abs(x-s.visual.x),max);s.visual.y+=Math.sign(y-s.visual.y)*Math.min(Math.abs(y-s.visual.y),max)};
-  m.view=()=>({kind:'scene',scene:'tanks',state:s,info:'Броня '+s.hp+' · Врагов '+s.enemies.length});
+  m.view=()=>({kind:'scene',scene:'tanks',state:s,info:'Броня '+s.hp+' · Врагов '+s.enemies.length+(s.enemyMode==='tactical'?' · Усиленные враги против бота':'')});
  }
  return m;
 };
