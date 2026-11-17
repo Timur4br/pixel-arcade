@@ -46,3 +46,10 @@
 @media(max-width:1000px){.fleet-game{grid-template-columns:72px 1fr 1fr;gap:6px}.fleet-garage{padding:3px}.fleet-game strong{font-size:9px}.holdem-table{padding:6px}.guard-game{padding:6px;gap:6px}.guard-slot.occupied b{font-size:10px}.guard-slot span{font-size:10px}}
 @media(max-width:760px){#gameDialog[data-game=transport] #board{grid-template-columns:1fr;grid-template-rows:minmax(80px,.6fr) minmax(120px,1fr)}.fleet-game{grid-template-columns:50px 1fr 1fr;gap:3px}.dock-ship small{font-size:7px}.fleet-garage>small{display:none}.ship-deck{width:9px}.guard-office{font-size:9px}.small-card{font-size:14px;width:35px;height:55px}.small-card b{font-size:20px}.holdem-table section>div{gap:3px}.holdem-table strong{font-size:9px}}
 @media(prefers-reduced-motion:reduce){.t4-piece,.t4-piece img,.code-log{transition:none;scroll-behavior:auto}}
+
+/* 0.5.1: one fixed frame per cover, independent of legacy art grids. */
+.card-art{display:block!important;position:relative;aspect-ratio:9/5;height:auto!important;min-width:0;padding:0!important;overflow:hidden;isolation:isolate;background:#142735!important}
+.card-art .game-cover{position:absolute;inset:0;display:block!important;width:100%!important;height:100%!important;min-width:0;max-width:100%;max-height:100%;object-fit:contain!important;object-position:center;grid-area:auto!important}
+.card-art::before{pointer-events:none;z-index:1}.card-art .number,.card-art .bot-badge{position:absolute!important;z-index:2}
+.rules-side{min-width:0;overflow-x:hidden;overflow-wrap:anywhere}.task-formulation p{white-space:pre-wrap;overflow-wrap:anywhere}
+.launch-error{margin:auto;max-width:480px;padding:24px;font:14px/1.7 monospace;color:#edc5a0}.launch-error h3{font-size:20px}
