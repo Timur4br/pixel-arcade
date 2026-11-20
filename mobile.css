@@ -1,4 +1,19 @@
 /* Phone and tablet layout. Desktop game grids remain unchanged. */
+/* Mute belongs to a toolbar, never on top of the game or page. */
+ #soundToggle,#gameDialog #soundToggle,#soundSettings #soundToggle{position:static!important;inset:auto;width:44px;height:44px;min-width:44px;flex:0 0 44px;margin:0;padding:9px;box-shadow:none;align-self:center;z-index:auto;order:0}
+ .catalog-header{column-gap:20px}.catalog-header #soundToggle{order:2}
+ .game-toolbar #soundToggle{margin-left:0}#soundSettings .sound-settings-head #soundToggle{margin-left:auto}
+ .sound-settings-head #closeSoundSettings{order:3;flex-shrink:0}.editor-head #soundToggle{margin-left:auto}
+ #soundSettings label[for=gameVolume],#soundSettings label[for=menuVolume]{display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%;font-size:13px;line-height:1.5;margin:20px 0 0}
+ #soundSettings label output{flex-shrink:0;font-variant-numeric:tabular-nums;min-width:4ch;text-align:right}
+@media(max-width:900px){
+ #soundSettings input[type=range]{appearance:none;-webkit-appearance:none;display:block;box-sizing:border-box;width:100%;max-width:100%;height:48px;min-height:48px;margin:4px 0 10px;padding:0;border:0;border-radius:0;background:linear-gradient(to right,#bded75 0 var(--volume-fill,50%),#41566b var(--volume-fill,50%) 100%) center/100% 10px no-repeat;touch-action:none;user-select:none;cursor:pointer}
+ #soundSettings input[type=range]::-webkit-slider-runnable-track{height:10px;border-radius:5px;background:transparent}
+ #soundSettings input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;box-sizing:border-box;width:28px;height:28px;margin-top:-9px;border:3px solid #e2f4c3;border-radius:50%;background:#91b65f;box-shadow:0 2px 5px #0006}
+ #soundSettings input[type=range]::-moz-range-track{height:10px;border:0;border-radius:5px;background:transparent}
+ #soundSettings input[type=range]::-moz-range-thumb{box-sizing:border-box;width:28px;height:28px;border:3px solid #e2f4c3;border-radius:50%;background:#91b65f;box-shadow:0 2px 5px #0006}
+ #soundSettings input[type=range]:focus-visible{outline:2px solid #bded75;outline-offset:2px}
+}
 .mobile-rules-toggle{display:none}
 @media(max-width:900px){
  html{scroll-padding-top:12px}body{overflow-x:clip}
@@ -92,3 +107,4 @@
  #gameDialog .mobile-rules-toggle{grid-column:2;grid-row:9}#gameDialog .rules-side{grid-column:1/-1;grid-row:10}
  #gameDialog[data-game=battleship] #board{position:static;height:auto!important;max-width:100%}#gameDialog[data-game=poker] #board,#gameDialog[data-game=bulls] #board,#gameDialog[data-game=transport] #board,#gameDialog[data-game=breach] #board{position:static;height:540px!important;max-width:100%}
 }
+
