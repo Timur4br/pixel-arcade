@@ -57,7 +57,7 @@ function snapshot(id,config){
  if(id==='snakepdf'){map.walls=[...s.walls];map.start=s.snake[0]}
  if(id==='plumber'){map.masks=[...s.masks];map.start=s.start;map.solutionMasks=[...s.target]}
  if(id==='mines')map.mines=[...s.mines];
- if(id==='lemmings'){map.start=41;map.ground=[...s.terrain];map.goal=s.exit}
+ if(id==='lemmings'){map.start=s.start??41;map.ground=[...s.terrain];map.goal=s.exit}
  return map;
 }
 function apply(id,m,map,config){
@@ -73,7 +73,7 @@ function apply(id,m,map,config){
  if(id==='arkanoid'){s.bricks=map.bricks.map(b=>({x:18+b.cell%10*45,y:25+(b.cell/10|0)*25,alive:true,color:b.color}));return m}
  if(id==='mines'){s.mines=[...map.mines];s.mineCount=s.mines.length;s.open=[];s.flags=[];s.first=true;return m}
  if(id==='snakepdf'){s.walls=[...map.walls];const route=R.search(s.pos,p=>p!==s.pos&&R.neighbors(p,w,h).filter(i=>i!==s.pos&&!s.walls.includes(i)).length>0,p=>R.neighbors(p,w,h).filter(i=>!s.walls.includes(i))).path;const a=route[1],b=a!==undefined?R.neighbors(a,w,h).find(i=>i!==s.pos&&!s.walls.includes(i)):undefined;if(a===undefined||b===undefined)throw Error('Оставь три соседние свободные клетки для змейки.');s.snake=[s.pos,a,b];s.dir=s.pos-a;s.next=s.dir;if(s.walls.includes(s.food)||s.snake.includes(s.food))s.food=all.find(i=>!s.walls.includes(i)&&!s.snake.includes(i));return m}
- if(id==='lemmings'){s.terrain=[...map.ground];s.exit=map.goal;const tick=m.tick;m.tick=(dt,bot)=>{const old=s.spawned;tick(dt,bot);for(const p of s.people)if(p.id>=old){p.x=map.start%w;p.y=map.start/w|0;p.fall=0}};return m}
+ if(id==='lemmings'){s.terrain=[...map.ground];s.exit=map.goal;if(s.rescueModel)return m;const tick=m.tick;m.tick=(dt,bot)=>{const old=s.spawned;tick(dt,bot);for(const p of s.people)if(p.id>=old){p.x=map.start%w;p.y=map.start/w|0;p.fall=0}};return m}
  const done=text=>{s.done=true;s.message=text},grid=cells=>({kind:'grid',w,h,cells,info:'Свой уровень · '+s.score});
  if(id==='sokoban'){
   s.walls=[...map.walls];s.boxes=[...map.boxes];s.goals=[...map.goals];const history=[];

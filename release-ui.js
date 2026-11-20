@@ -55,7 +55,7 @@ function render(v,s,id){
    if(id==='grasshopper')body=`<b class="jump-number">${s.numbers[i]}</b>`+(i===s.pos?img('person','jump-actor'):'');
    if(id==='lemmings'){
     const p=s.people.find(p=>p.y*s.w+p.x===i),symbols={walker:'➜',builder:'⚒',digger:'↓',basher:'▸',blocker:'✋',floater:'☂'};
-    body=s.terrain.includes(i)?img('rock'):p?img('lemming')+`<b class="role-icon role-${p.role}">${symbols[p.role]}</b>`:i===s.exit?'<span class="portal-pixel"></span>':'';
+    body=(s.terrain.includes(i)?img('rock'):'')+(i===s.start?'<span class="lemmings-spawn" title="Вход потока">▼</span>':'')+(i===s.exit?'<span class="portal-pixel" title="Выход"></span>':'')+(p?img('lemming')+`<b class="role-icon role-${p.role}">${symbols[p.role]}</b>`:'');
     if(p)tone+=' role-'+p.role;
    }
    if(id==='plumber'){
