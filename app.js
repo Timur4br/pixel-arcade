@@ -5,18 +5,38 @@ const games=[...CourseCatalog.games,
 {id:'memory',name:'Найди пару',genre:'Головоломки',desc:'Открывай карточки и находи пары. Хорошая память — твой козырь.',art:'<div class="preview memory-preview"><span>?</span><span>?</span><span>✳</span><span>?</span><span>?</span><span>✳</span><span>?</span><span>?</span></div>',help:'Открывай по две карточки и запоминай символы. Выбери поле 4×4, 6×6 или 8×8 и найди все пары.'}
 ,{id:'breach',name:'Взлом протокола',genre:'Логика · коды',desc:'Собери цепочки кодов, чередуя строки и столбцы. По мотивам мини-игры Cyberpunk 2077.',extended:true,customController:true,help:'Верхняя строка → столбец → строка. Загрузи цепочки в ограниченный буфер. Таймер начинается с первого выбора.'}
 ];
-let memoryLevel=0,puzzleLevel=0;let courseController=null;let catalogSearch='';let catalogTab='main';
+let memoryLevel=0,puzzleLevel=0;let courseController=null;let catalogSearch='';let catalogTab='main',catalogSubgenre='all';
 let active=null,mode='play',paused=false,ended=false,timer=null,score=0,state={},tick=0,last=0,frame=null,filter='Все игры',resumeAt=0;
 let records={};try{records=JSON.parse(localStorage.getItem('pixel-records')||'{}')}catch{}if(!records||typeof records!=='object')records={};
 function saveRecord(){if(mode!=='play'||!active||active.course)return;if(score>(records[active.id]||0)){records[active.id]=score;try{localStorage.setItem('pixel-records',JSON.stringify(records))}catch{}renderCards()}}
 const algorithmIds=new Set(['philosophers','maze','transport','ershov','sequential','postfix','prim','wave','boyer','knight','queens','bipartite','readers','buffer','sorting','hexpath']);
 const catalogSections={main:{name:'Весь каталог',note:'Игры, алгоритмы и дополнения — всё в одном месте'},games:{name:'Игры',note:'Аркады, головоломки и стратегии из основной подборки'},algorithms:{name:'Алгоритмы',note:'Учебные задачи: исследуй, пробуй и наблюдай за решением'},extra:{name:'Доп. игры',note:'Пинг-понг, 2048, «Найди пару» и «Взлом протокола»'},archive:{name:'Архив',note:'Предыдущие подборки — игры остаются доступны и поддерживаются'}};
+const catalogGenres=[
+{id:'arcade',name:'Аркады',ids:['snakepdf','arkanoid','lander','tetris','tanks','bomber','invaders']},
+{id:'puzzle',name:'Головоломки',ids:['bug','hanoi','shush','sokoban','fifteen','bulls','grasshopper','mines','robby','plumber','words','fullhex','2048','breach']},
+{id:'strategy',name:'Стратегии',ids:['battleship','poker','ticwide']},
+{id:'simulation',name:'Симуляции',ids:['parking','lemmings']},
+{id:'adventure',name:'Приключения',ids:['wolf','wumpus']},
+{id:'sport',name:'Спорт',ids:['pong']},
+{id:'memory',name:'Память',ids:['memory']},
+{id:'path',name:'Поиск пути',ids:['maze','wave','hexpath']},
+{id:'graph',name:'Графы',ids:['ershov','sequential','prim','bipartite']},
+{id:'strings',name:'Строки и выражения',ids:['boyer','postfix']},
+{id:'sorting',name:'Сортировки',ids:['sorting']},
+{id:'sync',name:'Синхронизация',ids:['philosophers','readers','buffer']},
+{id:'optimization',name:'Оптимизация',ids:['transport']},
+{id:'chess',name:'Шахматные задачи',ids:['knight','queens']}
+];
+function catalogGenre(game){return catalogGenres.find(genre=>genre.ids.includes(game.id))}
 function catalogCategory(game){return game.archived?'archive':!game.course?'extra':algorithmIds.has(game.id)?'algorithms':'games'}
 function catalogGames(tab=catalogTab){return games.filter(g=>tab==='main'?catalogCategory(g)!=='archive':catalogCategory(g)===tab)}
-function renderCards(){const section=catalogSections[catalogTab],visible=catalogGames();$('#catalogTitle').textContent=section.name+' / '+String(visible.length).padStart(2,'0');$('.section-note').textContent=section.note;
+function renderCards(){const section=catalogSections[catalogTab],available=catalogGames(),genres=catalogGenres.filter(genre=>available.some(g=>genre.ids.includes(g.id)));
+if(!genres.some(g=>g.id===catalogSubgenre))catalogSubgenre='all';
+const visible=available.filter(g=>catalogSubgenre==='all'||catalogGenre(g).id===catalogSubgenre),filters=$('#subgenreFilters');filters.hidden=!available.length;filters.innerHTML=available.length?'<button type="button" data-subgenre="all" aria-pressed="'+(catalogSubgenre==='all')+'" class="subgenre-button '+(catalogSubgenre==='all'?'selected':'')+'">Все <span>'+available.length+'</span></button>'+genres.map(genre=>'<button type="button" data-subgenre="'+genre.id+'" aria-pressed="'+(catalogSubgenre===genre.id)+'" class="subgenre-button '+(catalogSubgenre===genre.id?'selected':'')+'">'+genre.name+' <span>'+available.filter(g=>genre.ids.includes(g.id)).length+'</span></button>').join(''):'';
+$('#catalogTitle').textContent=section.name+' / '+String(visible.length).padStart(2,'0');$('.section-note').textContent=section.note;
 document.querySelectorAll('[data-catalog-tab]').forEach(b=>{const selected=b.dataset.catalogTab===catalogTab;b.classList.toggle('active',selected);b.setAttribute('aria-pressed',String(selected))});
 if(!visible.length){$('#cards').innerHTML='<div class="catalog-empty"><span aria-hidden="true">▧</span><h3>Архив пока пуст</h3><p>Здесь появятся игры из предыдущих подборок.<br>Они останутся доступны для игры и будут получать исправления.</p></div>';return}
-$('#cards').innerHTML=visible.map(g=>`<article class="card"><div class="card-art art-${g.id}"><span class="number">${g.course?String(g.number).padStart(2,'0'):'★'} /</span><span class="bot-badge">⌘ БОТ В ИГРЕ</span><img class="game-cover" src="assets/previews/${g.id}.svg" alt="${g.name}" loading="lazy"></div><div class="card-body"><div class="card-meta"><span class="genre">${g.genre}</span><span class="record">${g.course?(g.id==='battleship'?'1 поле · редактор':g.id==='sokoban'?'10 уровней · редактор':'3 уровня · редактор'):'Рекорд: '+(records[g.id]||0)}</span></div><h3>${g.name}</h3><p>${g.desc}</p><div class="card-buttons"><button class="primary" data-game="${g.id}" data-mode="play">Играть</button><button class="secondary" data-game="${g.id}" data-mode="bot">⌘ Бот</button></div></div></article>`).join('') }
+$('#cards').innerHTML=visible.map(g=>`<article class="card"><div class="card-art art-${g.id}"><span class="number">${g.course?String(g.number).padStart(2,'0'):'★'} /</span><span class="bot-badge">⌘ БОТ В ИГРЕ</span><img class="game-cover" src="assets/previews/${g.id}.svg" alt="${g.name}" loading="lazy"></div><div class="card-body"><div class="card-meta"><span class="genre">${catalogGenre(g).name}</span><span class="record">${g.course?(g.id==='battleship'?'1 поле · редактор':g.id==='sokoban'?'10 уровней · редактор':'3 уровня · редактор'):'Рекорд: '+(records[g.id]||0)}</span></div><h3>${g.name}</h3><p>${g.desc}</p><div class="card-buttons"><button class="primary" data-game="${g.id}" data-mode="play">Играть</button><button class="secondary" data-game="${g.id}" data-mode="bot">⌘ Бот</button></div></div></article>`).join('') }
 $('#cards').onclick=e=>{const b=e.target.closest('[data-game]');if(b)openGame(b.dataset.game,b.dataset.mode)};
 function setScore(n){score=n;$('#score').textContent=n}
 function status(s){$('#status').textContent=s}
@@ -63,4 +83,6 @@ $('#board').addEventListener('pointerup',e=>{if(!pointerStart)return;const dx=e.
 renderCards();
 
 
-for(const button of document.querySelectorAll('[data-catalog-tab]'))button.onclick=()=>{catalogTab=button.dataset.catalogTab;renderCards()};
+for(const button of document.querySelectorAll('[data-catalog-tab]'))button.onclick=()=>{catalogTab=button.dataset.catalogTab;catalogSubgenre='all';renderCards()};
+
+$('#subgenreFilters').onclick=e=>{const button=e.target.closest('[data-subgenre]');if(!button)return;catalogSubgenre=button.dataset.subgenre;renderCards();$('#subgenreFilters').querySelector('[data-subgenre="'+catalogSubgenre+'"]')?.focus({preventScroll:true})};
