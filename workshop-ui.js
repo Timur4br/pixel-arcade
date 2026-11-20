@@ -45,6 +45,11 @@ function prepare(panel,signal){
    else{const key={wall:'walls',hard:'hard',rock:'rocks',pit:'pits',beast:'beasts',enemy:'enemies',mine:'mines',ground:'ground',box:'boxes',target:'goals',black:'black'}[brush];if(key){if(brush!=='box'&&brush!=='target')erase(i);else for(const blocked of ['walls','hard','ground','pits','rocks','black','beasts','enemies'])remove(blocked,i);add(key,i)}}
    hint.textContent='Изменено. Можно продолжать рисовать или применить уровень.';write();draw();
   }
+  // Touch pointers retain their initial target: find the cell under the finger.
+  let lastTouchCell=null;
+  board.addEventListener('pointermove',e=>{if(!painting||e.pointerType==='mouse')return;e.preventDefault();const cell=document.elementFromPoint(e.clientX,e.clientY)?.closest('[data-vcell]');if(!cell||!board.contains(cell))return;const i=+cell.dataset.vcell;if(i!==lastTouchCell){lastTouchCell=i;paint(i)}},{signal});
+  board.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse')lastTouchCell=+(e.target.closest('[data-vcell]')?.dataset.vcell??-1)},{signal});
+  window.addEventListener('pointerup',()=>lastTouchCell=null,{signal});
   function resize(w,h){
    const oldW=map.w,oldH=map.h,old=clone(map),convert=i=>i%oldW<w&&(i/oldW|0)<h?(i/oldW|0)*w+i%oldW:null;map.w=w;map.h=h;
    for(const key of ['walls','hard','cells','pits','beasts','rocks','boxes','goals','black','enemies','ground','mines'])if(old[key])map[key]=old[key].map(convert).filter(i=>i!==null);
@@ -87,3 +92,4 @@ return {prepare,breach};
  const editor=T4UI.editor;T4UI.editor=(panel,onClose)=>{const base=editor(panel,onClose);let events=new AbortController();return {open(){events.abort();events=new AbortController();Workshop.prepare(panel,events.signal);base.open()},close(){base.close()},dispose(){events.abort();base.dispose()}}};
  const create=PixelArt.render;PixelArt.render=(v,s,id,model)=>{if(id==='breach')return Workshop.breach(s);if(id==='robby'&&s.blocks?.length){const picture=n=>`<img src="${globalThis.PixelAssets?.[n]||'assets/'+n+'.svg'}" alt="">`;return `<div class="t4-field" style="--cols:${s.w};--rows:${s.h}"><div class="t4-cells" style="grid-template-columns:repeat(${s.w},1fr)">${v.cells.map((c,i)=>`<button data-more-cell="${i}" class="${c.tone}">${s.blocks.includes(i)?picture('wall'):s.pos===i?picture('robby'):s.black.includes(i)?'<span class="pit"></span>':'<span class="dot '+(s.path.includes(i)?'gold':'')+'"></span>'}</button>`).join('')}</div></div>`}return create(v,s,id,model)};
 })();
+

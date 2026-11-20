@@ -1,0 +1,94 @@
+/* Phone and tablet layout. Desktop game grids remain unchanged. */
+.mobile-rules-toggle{display:none}
+@media(max-width:900px){
+ html{scroll-padding-top:12px}body{overflow-x:clip}
+ header.catalog-header,main,footer{width:calc(100% - 32px);max-width:100%}
+ .catalog-header{height:auto;min-height:76px;padding:14px 0 8px;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+ .catalog-header .logo{font-size:24px}.catalog-header .header-note{display:none}
+ .catalog-header .site-settings-button{margin-left:auto;min-height:44px;padding:10px 12px;font-size:12px}
+ .catalog-header nav{order:3;flex-basis:100%;width:100%;display:flex;flex-wrap:nowrap;gap:20px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin;margin:0;padding:2px 0 8px}
+ .catalog-header nav button{flex:none;min-height:44px;font-size:12px;white-space:nowrap;padding:8px 0}
+ .catalog-header nav,.subgenre-filters{scrollbar-width:none}.catalog-header nav::-webkit-scrollbar,.subgenre-filters::-webkit-scrollbar{display:none}
+ .hero{padding:28px 0}.hero h1{font-size:clamp(32px,7.9vw,54px);letter-spacing:-1.5px;margin:20px 0;line-height:1.17}
+ .hero .spark{font-size:30px;vertical-align:5px;margin-left:10px}.hero-art{opacity:.16;right:-170px;pointer-events:none}
+ .hero p{font-size:12px;line-height:1.8}.hero p br{display:none}
+ .section-heading{padding-top:22px}.subgenre-filters{display:flex;flex-wrap:nowrap!important;gap:8px;overflow-x:auto;overscroll-behavior-x:contain;padding:12px 0 16px;margin:0 0 6px;scrollbar-width:thin}
+ .subgenre-filters button{flex:none;min-height:44px;padding:10px 12px;font-size:11px;white-space:nowrap}
+ .cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.card{min-width:0}.card h3{overflow-wrap:anywhere}.card-buttons button{min-height:44px}
+ footer{flex-wrap:wrap;gap:14px;padding-bottom:calc(28px + env(safe-area-inset-bottom))}footer .text-button{min-height:44px}
+ body:has(dialog[open]){overflow:hidden}
+ #gameDialog,#gameDialog:has(.course-board){inset:0;margin:0;width:100%;max-width:100%;height:100dvh;max-height:100dvh;border-width:0;overflow:auto;overscroll-behavior:contain;box-shadow:none}
+ #gameDialog .game-shell{display:flex!important;flex-direction:column;gap:10px;height:auto;min-height:100%;overflow:visible;padding:calc(10px + env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))!important}
+ #gameDialog .game-shell>*{min-width:0;flex-shrink:0;max-width:100%}
+ #gameDialog .game-top{order:0;position:sticky;top:-1px;z-index:12;gap:12px;background:#181c27;padding:6px 0 8px;border-bottom:1px solid #3c526a}
+ #gameDialog .game-top h2,#gameDialog:has(.course-board) #gameTitle{font-size:17px;line-height:1.35;overflow-wrap:anywhere}
+ #gameDialog .icon-button,#soundSettings .icon-button{width:44px;height:44px;flex:none}
+ #gameDialog .game-toolbar{order:1;display:flex;flex-wrap:wrap;gap:8px;margin:0;min-height:44px}
+ #gameDialog .mode-switch{max-width:100%}#gameDialog .mode-switch button{min-height:40px;font-size:12px;padding:8px 10px}
+ #gameDialog .game-toolbar .score-label{font-size:10px;margin-left:auto}#gameDialog .game-toolbar .score-label strong{font-size:20px}
+ #gameDialog .audio-game-settings{width:44px;min-height:44px;padding:8px}
+ #gameDialog #courseControls,#gameDialog #moreControls,#gameDialog #extraControls{order:2;margin:0;align-self:stretch}
+ #gameDialog .level-bar{display:flex!important;flex-wrap:wrap;gap:8px;align-items:center}
+ #gameDialog .level-bar label{display:flex;align-items:center;gap:6px;font-size:12px;max-width:100%}
+ #gameDialog .level-bar select{font-size:16px;min-height:44px;max-width:100%;min-width:0;margin:0}
+ #gameDialog .level-bar button{font-size:12px;min-height:44px;padding:8px 12px}
+ #gameDialog[data-game=lemmings] .level-bar label{flex-basis:100%}
+ #gameDialog #board,#gameDialog #board.course-board,#gameDialog #board.more-board{order:3;flex:none;align-self:center;width:100%!important;height:min(calc(100vw - 24px),52svh)!important;max-width:620px;min-height:240px;aspect-ratio:auto;container-type:size;margin:0;border-width:2px;box-shadow:none}
+ #gameDialog #board[data-shape=tetris]{height:min(42svh,500px)!important;min-height:260px;width:auto!important;aspect-ratio:1/2!important;max-width:100%}
+ #gameDialog[data-game=transport] #board{height:560px!important;grid-template-columns:minmax(0,1fr);grid-template-rows:230px minmax(0,1fr);overflow:auto}
+ #gameDialog[data-game=battleship] #board{height:auto!important;min-height:0;container-type:inline-size}
+ #gameDialog[data-game=poker] #board{height:540px!important}
+ #gameDialog[data-game=bulls] #board{height:650px!important}
+ #gameDialog[data-game=breach] #board{height:500px!important}
+ #gameDialog #courseExtra,#gameDialog #moreExtra{order:4;display:flex;gap:8px;margin:0;max-width:100%}
+ #gameDialog #courseExtra:empty,#gameDialog #moreExtra:empty{display:none}
+ #gameDialog #moreExtra button,#gameDialog #courseExtra button{font-size:12px;min-height:44px;padding:9px 12px}
+ #gameDialog #moreExtra input{max-width:100%;font-size:16px;min-height:44px}
+ #gameDialog #moreInfo{order:5;font-size:12px;line-height:1.5;margin:0}
+ #gameDialog .game-status{order:6;min-height:24px;font-size:12px;padding:4px;line-height:1.5}
+ #gameDialog #touchControls{order:7;position:sticky;bottom:8px;z-index:10;margin:0;display:flex;gap:6px;justify-content:center;align-self:center;touch-action:none;padding:6px;background:#152333f5;border:1px solid #3c526a}
+ #gameDialog #touchControls[hidden]{display:none!important}#gameDialog #touchControls>div{display:flex;gap:6px}
+ #gameDialog #touchControls button{width:52px;height:48px;margin:0;font-size:23px;user-select:none;touch-action:none}
+ #gameDialog .game-actions{order:8;display:flex;flex-wrap:wrap;gap:8px;align-self:stretch}
+ #gameDialog .game-actions button{min-height:44px;font-size:12px;padding:10px 16px}#gameDialog .game-actions label{font-size:12px;margin:0}#gameDialog .game-actions select{min-height:44px;font-size:16px}
+ #gameDialog .coming{display:none}#gameDialog .mobile-rules-toggle{order:9;display:flex;align-items:center;justify-content:space-between;min-height:48px;padding:12px;font-size:13px;align-self:stretch;text-align:left}
+ #gameDialog .mobile-rules-toggle::after{content:'+';font-size:20px}#gameDialog .mobile-rules-toggle[aria-expanded=true]::after{content:'−'}
+ #gameDialog .rules-side{order:10;display:none;overflow:visible;padding:14px;max-height:none;align-self:stretch}#gameDialog .rules-side.mobile-rules-open{display:block}
+ #gameDialog .rules-side h3{font-size:13px}#gameDialog .rules-side #instructions{font-size:13px;line-height:1.8}
+ #gameDialog .rules-side .game-options label{font-size:12px}#gameDialog .rules-side select,#gameDialog .rules-side input{font-size:16px;min-height:44px}
+ #gameDialog .task-formulation summary,#gameDialog .bot-explanation summary{padding:10px 0;font-size:12px}.task-formulation p{font-size:12px!important}
+ #gameDialog .fleet-game{--sea-size:min(calc(100cqw - 20px),440px);display:grid;height:auto;grid-template-columns:minmax(0,1fr);grid-template-rows:auto;justify-content:stretch;padding:8px;gap:16px;overflow:visible}
+ #gameDialog .fleet-game>section{width:100%;height:auto;max-height:none}#gameDialog .fleet-game .fleet-garage{height:auto;max-height:none;overflow:visible}
+ #gameDialog .fleet-game .sea-wrapper{width:var(--sea-size);height:var(--sea-size);margin:auto}
+ #gameDialog[data-game=knight] .pixel-grid button,#gameDialog[data-game=queens] .pixel-grid button{font-size:clamp(18px,calc(80cqw / var(--cols,8)),44px)!important}.chess-piece{font-size:clamp(18px,calc(80cqw / var(--cols,8)),44px)}.knight-index{font-size:10px}
+ #gameDialog .fleet-garage{flex-direction:row;flex-wrap:wrap;gap:6px;justify-content:flex-start;padding:6px}.fleet-garage .dock-ship{min-width:56px;min-height:44px;flex:1}.fleet-garage .dock-ship small{font-size:10px}
+ #gameDialog .fleet-game strong{font-size:12px}.fleet-game .sea-wrapper{max-width:440px;margin:auto}.sea-field{height:100%}
+ #gameDialog .code-duel{padding:6px;gap:8px;grid-template-columns:minmax(0,1fr);grid-template-rows:1.4fr 1fr}#gameDialog .code-duel h3{font-size:12px}
+ #gameDialog .duel-proposal button{width:40px;height:40px}#gameDialog .duel-palette button{width:38px;height:38px}.duel-palette{gap:6px}
+ #gameDialog .tournament-table{grid-template-rows:110px 110px 100px auto;padding:6px}.poker-actions button{min-height:44px!important;font-size:12px!important}.poker-actions input{font-size:16px;min-height:44px}
+ #gameDialog .poker-seat .seat-heading{font-size:10px}.poker-seat small{font-size:10px}.poker-card{width:30px;height:44px}
+ #gameDialog .breach-screen{grid-template-rows:32px 36px minmax(0,1fr);gap:8px;padding:8px}.breach-body{grid-template-rows:minmax(220px,1fr) auto}.breach-matrix button{font-size:18px}.breach-targets{gap:6px}.breach-targets strong{font-size:10px}.breach-targets span{font-size:12px}
+ .editor-dialog{inset:0;width:100%!important;max-width:100%!important;height:100dvh;max-height:100dvh;margin:0;border-width:0;overscroll-behavior:contain}
+ .editor-dialog .editor-head{gap:8px}.editor-dialog button{min-height:44px;font-size:12px}.editor-dialog input,.editor-dialog select,.editor-dialog textarea{font-size:16px}
+ .editor-dialog .work-layout{grid-template-columns:minmax(0,1fr);gap:16px}.editor-dialog .work-board{width:min(100%,calc(52svh * var(--cols) / var(--rows)));max-height:52svh}
+ .editor-dialog .work-tools{max-height:none;overflow:visible;padding:10px}.editor-dialog .work-brushes{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.editor-dialog .work-brushes button{font-size:11px;overflow-wrap:anywhere}
+ .editor-dialog .work-tools label{font-size:12px}.editor-dialog .work-form{grid-template-columns:minmax(0,1fr)}.editor-dialog .work-form:has(.work-transport){overflow:auto}.editor-dialog .editor-actions{gap:8px;padding-bottom:calc(12px + env(safe-area-inset-bottom))}
+ #soundSettings.site-settings{width:calc(100% - 20px);max-height:calc(100dvh - 20px);margin:auto;padding:18px;overflow:auto;overscroll-behavior:contain}
+ #soundSettings select{display:block;width:100%;margin:10px 0;font-size:16px;min-height:44px}#soundSettings input[type=range]{min-height:40px}#soundSettings .settings-tabs button{min-height:44px;font-size:13px}#soundSettings .settings-hint{font-size:12px}
+ .sound-toggle{right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom));width:44px;height:44px}
+ #gameDialog .sound-toggle{position:static;order:11;align-self:flex-end;margin-top:4px}
+}
+@media(max-width:540px){.cards{grid-template-columns:minmax(0,1fr)}.card h3{min-height:0;font-size:20px}.card p{min-height:0}.card-body{padding:18px}.card-meta{flex-wrap:wrap;gap:8px}.card-buttons{gap:10px}.card-buttons button{font-size:13px}.hero-art{display:none}.hero h1{font-size:clamp(30px,8.5vw,44px)}.hero p{font-size:12px}.section-heading h2{font-size:20px}}
+@media(max-width:360px){#gameDialog .mode-switch button{font-size:11px;padding:8px}.editor-dialog .work-brushes{grid-template-columns:repeat(2,minmax(0,1fr))}.catalog-header .logo{font-size:21px}.catalog-header .site-settings-button{font-size:11px}}
+@media(max-width:900px) and (orientation:landscape){#gameDialog #board,#gameDialog #board.course-board,#gameDialog #board.more-board{height:75svh!important;max-width:70svh;min-height:220px}#gameDialog #board[data-shape=tetris]{height:95svh!important;max-width:none}#gameDialog[data-game=battleship] #board{height:auto!important;max-width:520px}#gameDialog[data-game=poker] #board,#gameDialog[data-game=bulls] #board,#gameDialog[data-game=transport] #board,#gameDialog[data-game=breach] #board{height:540px!important;max-width:620px}}
+@media(min-width:600px) and (max-width:900px) and (max-height:500px) and (orientation:landscape){
+ #gameDialog .game-shell{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(270px,.95fr);grid-template-rows:repeat(9,auto);align-content:start;gap:8px 18px}
+ #gameDialog .game-top{grid-column:1/-1;grid-row:1}
+ #gameDialog #board,#gameDialog #board.course-board,#gameDialog #board.more-board{grid-column:1;grid-row:2/10;align-self:start;justify-self:center;position:sticky;top:70px;height:calc(100svh - 90px)!important;min-height:0;max-width:calc(100svh - 90px);width:100%!important}
+ #gameDialog #board[data-shape=tetris]{width:auto!important;max-width:100%;height:calc(100svh - 90px)!important}
+ #gameDialog .game-toolbar{grid-column:2;grid-row:2}#gameDialog #courseControls,#gameDialog #moreControls,#gameDialog #extraControls{grid-column:2;grid-row:3}
+ #gameDialog #courseExtra,#gameDialog #moreExtra{grid-column:2;grid-row:4}#gameDialog #moreInfo{grid-column:2;grid-row:5}#gameDialog .game-status{grid-column:2;grid-row:6}
+ #gameDialog #touchControls{grid-column:2;grid-row:7;position:static;justify-self:center}#gameDialog .game-actions{grid-column:2;grid-row:8}
+ #gameDialog .mobile-rules-toggle{grid-column:2;grid-row:9}#gameDialog .rules-side{grid-column:1/-1;grid-row:10}
+ #gameDialog[data-game=battleship] #board{position:static;height:auto!important;max-width:100%}#gameDialog[data-game=poker] #board,#gameDialog[data-game=bulls] #board,#gameDialog[data-game=transport] #board,#gameDialog[data-game=breach] #board{position:static;height:540px!important;max-width:100%}
+}
