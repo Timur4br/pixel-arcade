@@ -87,6 +87,6 @@ for(const button of document.querySelectorAll('[data-catalog-tab]'))button.oncli
 
 $('#subgenreFilters').onclick=e=>{const button=e.target.closest('[data-subgenre]');if(!button)return;catalogSubgenre=button.dataset.subgenre;renderCards();$('#subgenreFilters').querySelector('[data-subgenre="'+catalogSubgenre+'"]')?.focus({preventScroll:true})};
 
-globalThis.PixelSound?.init();
+globalThis.PixelSound?.init(games);
 let audioSettingsPaused=false;
 document.addEventListener('pixel-audio-settings',e=>{if(e.detail.open){audioSettingsPaused=!!active&&!paused&&!ended;if(audioSettingsPaused)pause()}else{if(audioSettingsPaused&&active&&paused&&!ended&&!document.hidden)pause();audioSettingsPaused=false}});
