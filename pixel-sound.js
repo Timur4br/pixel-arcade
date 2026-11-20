@@ -33,6 +33,11 @@ class Synth{
   if(this.next<this.ctx.currentTime-.1)this.next=this.ctx.currentTime+.03;
   const play=(pitch,time,duration,volume,instrument,pan=0)=>this.voice({freq:note(pitch),time,duration,volume:volume*scale,instrument,pan,bus,music:true,layer});
   while(this.next<this.ctx.currentTime+.18){const k=this.step,time=this.next;
+   if(theme.bars){
+    for(const n of PixelMusicThemes.eventAt(theme,k))play(n.pitch,time,n.duration*beat*.9,theme.style==='shore16'?.095:.13,theme.instrument,theme.style==='shore16'?-.2:-.12);
+    for(const e of PixelMusicThemes.backingAt(theme,k)){if(e.noise)this.voice({noise:true,time,duration:e.duration*beat,volume:e.volume*scale,pan:e.pan,bus,music:true,layer});else play(e.pitch,time+(e.delay||0)*beat,e.duration*beat,e.volume,e.instrument,e.pan);}
+   }else{
+
    for(const n of PixelMusicThemes.eventAt(theme,k))play(n.pitch,time,Math.max(.12,n.duration*beat*.9),theme.style==='ambient16'?.085:theme.style==='march16'?.09:.105,theme.instrument,theme.style==='ambient16'?Math.sin(k*.11)*.18:-.12);
    if(theme.style==='ambient16'){
     const local=k%64,section=Math.floor((k%theme.units)/64),chord=theme.chords[section];
@@ -42,6 +47,7 @@ class Synth{
    }else if(theme.style!=='march16'){
     if(k%4===0)play(theme.bass[Math.floor(k/4)%theme.bass.length],time,beat*2.5,.08,'bass',.08);
     if(k%8===2)theme.chords[Math.floor(k/8)%theme.chords.length].forEach((pitch,i)=>play(pitch,time+i*.015,beat*1.5,.025,'keys',.25));
+   }
    }
    layer.warm=false;this.step++;this.next+=beat;
   }
